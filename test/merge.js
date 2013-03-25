@@ -37,13 +37,12 @@ function generate(chunk, fn) {
     fn = chunk
     chunk = game.getChunkAtPosition([0,0,0])
   }
-  for (var x = chunk.position[X] * chunk.dims[WIDTH]; x < chunk.dims[WIDTH] + chunk.position[X] * chunk.dims[WIDTH]; x++) {
-    for (var y = chunk.position[Y] * chunk.dims[HEIGHT]; y < chunk.dims[HEIGHT] + chunk.position[Y] * chunk.dims[HEIGHT]; y++) {
-      for (var z = chunk.position[Z] * chunk.dims[DEPTH]; z < chunk.dims[DEPTH] + chunk.position[Z] * chunk.dims[DEPTH]; z++) {
-        game.setBlock([x, y, z], fn(x,y,z) || 0)
-      }
-    }
-  }
+
+	for (var x = chunk.position[X] * chunk.dims[WIDTH]; x < chunk.dims[WIDTH] + chunk.position[X] * chunk.dims[WIDTH]; x++)
+	for (var y = chunk.position[Y] * chunk.dims[HEIGHT]; y < chunk.dims[HEIGHT] + chunk.position[Y] * chunk.dims[HEIGHT]; y++)
+	for (var z = chunk.position[Z] * chunk.dims[DEPTH]; z < chunk.dims[DEPTH] + chunk.position[Z] * chunk.dims[DEPTH]; z++) {
+		game.setBlock([x, y, z], fn(x,y,z) || 0)
+	}
 }
 
 window.game = game
@@ -99,7 +98,7 @@ describe('x', function() {
       generate(function(x, y, z) {
         if (y == 0 && z == 0) return 1
       })
-    result = merge(getBlock, chunk)
+			result = merge.findOne(getBlock, chunk)
     })
 
     beforeEach(function() {
@@ -115,6 +114,7 @@ describe('x', function() {
       assert.equal(result.dims[DEPTH], 1)
     })
   })
+
   describe('broken row on x', function() {
     beforeEach(function() {
       generate(function(x, y, z) {
@@ -125,7 +125,7 @@ describe('x', function() {
         return 0
       })
 
-      result = merge(getBlock, chunk)
+      result = merge.findOne(getBlock, chunk)
     })
 
     beforeEach(function() {
@@ -151,7 +151,7 @@ describe('y', function() {
         if (y < game.chunkSize && x == 0 && z == 0) return 1
           return 0
       })
-      result = merge(getBlock, chunk)
+      result = merge.findOne(getBlock, chunk)
     })
 
     beforeEach(function() {
@@ -176,7 +176,7 @@ describe('y', function() {
             return 1
         }
       })
-      result = merge(getBlock, chunk)
+      result = merge.findOne(getBlock, chunk)
     })
 
     beforeEach(function() {
@@ -201,7 +201,7 @@ describe('y', function() {
           return 1
         }
       })
-      result = merge(getBlock, chunk)
+      result = merge.findOne(getBlock, chunk)
     })
 
     beforeEach(function() {
@@ -226,7 +226,7 @@ describe('y', function() {
           return 1
         }
       })
-      result = merge(getBlock, chunk)
+      result = merge.findOne(getBlock, chunk)
     })
 
     beforeEach(function() {
@@ -243,8 +243,6 @@ describe('y', function() {
       assert.equal(result.dims[DEPTH], 1)
     })
   })
-
-
 })
 
 describe('z', function() {
@@ -256,7 +254,7 @@ describe('z', function() {
         }
         return 0
       })
-      result = merge(getBlock, chunk)
+      result = merge.findOne(getBlock, chunk)
     })
 
     beforeEach(function() {
@@ -281,7 +279,7 @@ describe('z', function() {
             return 1
         }
       })
-      result = merge(getBlock, chunk)
+      result = merge.findOne(getBlock, chunk)
     })
 
     beforeEach(function() {
@@ -304,7 +302,7 @@ describe('z', function() {
       generate(function(x, y, z) {
         return 1
       })
-      result = merge(getBlock, chunk)
+      result = merge.findOne(getBlock, chunk)
     })
 
     beforeEach(function() {
@@ -333,7 +331,7 @@ describe('z', function() {
           return 0
       })
 
-      result = merge(getBlock, chunk)
+      result = merge.findOne(getBlock, chunk)
     })
 
     beforeEach(function() {
@@ -362,7 +360,7 @@ describe('cube', function() {
         }
         return 0
     })
-    result = merge(getBlock, chunk)
+    result = merge.findOne(getBlock, chunk)
   })
 
   beforeEach(function() {
@@ -384,7 +382,7 @@ describe('multi find', function() {
               return 1
             }
         })
-        results = merge.all(getBlock, chunk, function(result) {
+        results = merge(getBlock, chunk, function(result) {
           merge.voxelsIn(result).forEach(function(pos) {
             game.setBlock(pos, 2)
           })
@@ -404,7 +402,7 @@ describe('multi find', function() {
               return 1
             }
         })
-        results = merge.all(getBlock, chunk, function(result) {
+        results = merge(getBlock, chunk, function(result) {
           merge.voxelsIn(result).forEach(function(pos) {
             game.setBlock(pos, 2)
           })
@@ -415,7 +413,9 @@ describe('multi find', function() {
         assert.equal(results.length, 6)
       })
     })
+
     describe('random stuff', function() {
+			// TODO move this as it isn't stairs
       beforeEach(function() {
         generate(function(x, y, z) {
           if (y < 10) {
@@ -433,19 +433,20 @@ describe('multi find', function() {
             }
 
         })
-        results = merge.all(getBlock, chunk, function(result) {
+        results = merge(getBlock, chunk, function(result) {
           merge.voxelsIn(result).forEach(function(pos) {
             game.setBlock(pos, 2)
           })
         })
         results.forEach(showMesh)
       })
+
       it('creates a bunch of boxes', function() {
         assert.ok(results.length)
       })
     })
-
   })
+
   describe('broken area shape on xy', function() {
     beforeEach(function() {
       generate(function(x, y, z) {
@@ -454,7 +455,7 @@ describe('multi find', function() {
           return 1
         }
       })
-      results = merge.all(getBlock, chunk, function(result) {
+      results = merge(getBlock, chunk, function(result) {
         merge.voxelsIn(result).forEach(function(pos) {
           game.setBlock(pos, 2)
         })
@@ -464,6 +465,7 @@ describe('multi find', function() {
       assert.equal(results.length, 4)
     })
   })
+
   describe('broken area shape on xz', function() {
     beforeEach(function() {
       generate(function(x, y, z) {
@@ -472,13 +474,14 @@ describe('multi find', function() {
             return 1
         }
       })
-      results = merge.all(getBlock, chunk, function(result) {
+      results = merge(getBlock, chunk, function(result) {
         merge.voxelsIn(result).forEach(function(pos) {
           game.setBlock(pos, 2)
         })
       })
       results.forEach(showMesh)
     })
+
     it('creates optimum number of boxes', function() {
       assert.equal(results.length, 4)
     })
@@ -490,17 +493,19 @@ describe('multi find', function() {
         if (x === game.chunkSize / 2 && y === game.chunkSize / 2 && z === game.chunkSize - 1) return 0
           return 1
       })
-      results = merge.all(getBlock, chunk, function(result) {
+      results = merge(getBlock, chunk, function(result) {
         merge.voxelsIn(result).forEach(function(pos) {
           game.setBlock(pos, 2)
         })
       })
       results.forEach(showMesh)
     })
+
     it('creates optimum number of boxes', function() {
       assert.equal(results.length, 5)
     })
   })
+
   describe('different chunks', function() {
 		var chunk
 		afterEach(function() {
@@ -508,13 +513,14 @@ describe('multi find', function() {
 				return 0
 			})
 		})
+
     describe('single row on x', function() {
       beforeEach(function() {
         chunk = game.getChunkAtPosition([game.chunkSize, game.chunkSize, game.chunkSize])
         generate(chunk, function(x, y, z) {
           if (y == game.chunkSize && z == game.chunkSize) return 1
         })
-        results = merge.all(getBlock, chunk, function(result) {
+        results = merge(getBlock, chunk, function(result) {
           merge.voxelsIn(result).forEach(function(pos) {
             game.setBlock(pos, 2)
           })
@@ -542,13 +548,14 @@ describe('multi find', function() {
               y -  game.chunkSize < game.chunkSize - 1 &&
               z -  game.chunkSize < game.chunkSize - 1) return 1
         })
-        results = merge.all(getBlock, chunk, function(result) {
+        results = merge(getBlock, chunk, function(result) {
           merge.voxelsIn(result).forEach(function(pos) {
             game.setBlock(pos, 2)
           })
         })
         results.forEach(showMesh)
       })
+
       it('merges correctly', function() {
         assert.equal(results.length, 1)
         var result = results[0]
@@ -565,13 +572,14 @@ describe('multi find', function() {
           if (x === game.chunkSize + game.chunkSize / 2 && y === game.chunkSize && z === game.chunkSize) return 0
           return 1
         })
-        results = merge.all(getBlock, chunk, function(result) {
+        results = merge(getBlock, chunk, function(result) {
           merge.voxelsIn(result).forEach(function(pos) {
             game.setBlock(pos, 2)
           })
         })
         results.forEach(showMesh)
       })
+
       it('merges correctly', function() {
         assert.equal(results.length, 4)
       })
@@ -588,36 +596,38 @@ describe('multi find', function() {
         return 1
       }
       })
-      results = merge.all(getBlock, chunk, function(result) {
+      results = merge(getBlock, chunk, function(result) {
         merge.voxelsIn(result).forEach(function(pos) {
           game.setBlock(pos, 2)
         })
         showMesh(result)
       })
     })
+
     it('works', function() {
       assert.equal(results.length, 3)
     })
   })
 
-  describe('terrain', function() {
-    beforeEach(function() {
-      generate(function(x, y, z) {
-        var val = y + 4 * Math.sin(x / game.chunkSize * 10)
-        if (val > 2 && val < 5) return 1
-      })
-    results = merge.all(getBlock, chunk, function(result) {
-      merge.voxelsIn(result).forEach(function(pos) {
-        game.setBlock(pos, 2)
-      })
-      showMesh(result)
-    })
+	describe('terrain', function() {
+		beforeEach(function() {
+			generate(function(x, y, z) {
+				var val = y + 4 * Math.sin(x / game.chunkSize * 10)
+				if (val > 2 && val < 5) return 1
+			})
+			results = merge(getBlock, chunk, function(result) {
+				merge.voxelsIn(result).forEach(function(pos) {
+					game.setBlock(pos, 2)
+				})
+				showMesh(result)
+			})
+		})
 
-    })
-    it('works', function() {
-      assert.equal(results.length, 14)
-    })
-  })
+		it('works', function() {
+			assert.equal(results.length, 14)
+		})
+	})
+
   describe('box with chinks', function() {
     beforeEach(function() {
       generate(function(x, y, z) {
@@ -626,7 +636,7 @@ describe('multi find', function() {
       })
       var removeBlock = game.blockPosition([2.7786577951257296, 2.999999957666711, 5.581482984617888])
       game.setBlock(removeBlock, 0)
-      results = merge.all(getBlock, chunk, function(result) {
+      results = merge(getBlock, chunk, function(result) {
         merge.voxelsIn(result).forEach(function(pos) {
           assert.notDeepEqual(pos, removeBlock)
           game.setBlock(pos, 2)
@@ -637,7 +647,7 @@ describe('multi find', function() {
       game.setBlock(removeBlock, 0)
     })
     it('works', function() {
-      //assert.equal(results.length, 14)
+			assert.equal(results.length, 5)
     })
   })
 })
