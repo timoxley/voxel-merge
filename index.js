@@ -135,7 +135,6 @@ voxelMerge.voxelsIn = function voxelsIn(box) {
  *
  * @return {OffsetChunk}
  * @api private
- *
  */
 
 function ensureBox(chunk) {
