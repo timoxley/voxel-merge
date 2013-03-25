@@ -1,0 +1,16 @@
+{
+  "name": "voxel-merge",
+  "version": "0.0.0",
+  "description": "Merge Voxels to create convex volumes",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "",
+  "author": "",
+  "license": "BSD",
+  "devDependencies": {
+    "painterly-textures": "0.0.3",
+    "voxel-engine": "~0.14.4"
+  }
+}
